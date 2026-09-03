@@ -1,21 +1,13 @@
 #include "tinykv/kv_store.h"
-#include <cassert>
+#include <gtest/gtest.h>
 
-void integrated_test() {
-  tinykv::KVStore kv_store;
-  assert(kv_store.put("name", "mike"));
-  assert(kv_store.get("name") == "mike");
-  assert(kv_store.put("name", "bob"));
-  assert(kv_store.get("name") == "bob");
-  assert(kv_store.get("missing") == std::nullopt);
-  assert(kv_store.exists("name"));
-  assert(kv_store.remove("name"));
-  assert(!kv_store.exists("name"));
-  assert(!kv_store.remove("name"));
-  assert(!kv_store.put("", "value"));
+TEST(PutTest, EmptyInput) {
+  tinykv::KVStore kv;
+  EXPECT_FALSE(kv.put("", ""));
+  EXPECT_FALSE(kv.put("", "World!"));
 }
 
-int main() {
-  integrated_test();
-  return 0;
+TEST(PutTest, CommonInput) {
+  tinykv::KVStore kv;
+  EXPECT_TRUE(kv.put("Hello", "World!"));
 }

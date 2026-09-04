@@ -10,6 +10,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_library(tinykv_core 
     src/kv_store.cpp
     src/command_parser.cpp
+    src/command_executor.cpp
 )
 
 target_compile_features(tinykv_core PUBLIC cxx_std_17)

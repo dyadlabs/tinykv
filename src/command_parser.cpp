@@ -2,7 +2,7 @@
 
 namespace tinykv {
 
-Command CommandParser::parse(const std::string &input) const {
+Command CommandParser::parse(const std::string &input) {
   auto tokens = tokenize(input);
   Command command;
   if (tokens.empty()) {
@@ -15,8 +15,7 @@ Command CommandParser::parse(const std::string &input) const {
   return command;
 }
 
-std::vector<std::string>
-CommandParser::tokenize(const std::string &input) const {
+std::vector<std::string> CommandParser::tokenize(const std::string &input) {
   std::vector<std::string> tokens;
   std::string current;
   bool in_quotes = false;
@@ -24,6 +23,7 @@ CommandParser::tokenize(const std::string &input) const {
   for (char ch : input) {
     if (ch == '"') {
       in_quotes = !in_quotes;
+      continue;
     }
 
     if (std::isspace(static_cast<unsigned char>(ch)) && !in_quotes) {
@@ -35,6 +35,10 @@ CommandParser::tokenize(const std::string &input) const {
     }
 
     current += ch;
+  }
+
+  if (in_quotes) {
+    throw std::runtime_error("Incomplete quotes");
   }
 
   if (!current.empty()) {

@@ -19,8 +19,15 @@ Version 0 provides an in-memory key-value store. Data is lost when the program e
 
 ## Build
 
-Todo
+We use `cmake` to build the program.
+```bash
+cmake -S . -B build         # generate a makefile for building in the `build` directory
+cmake --build build         # build the program to the `build` directory
+```
 
 ## Usage
 
-Todo
+After building, you can use the program as follows.
+```bash
+./build/tinykv              # start the program in interactive mode by default
+```

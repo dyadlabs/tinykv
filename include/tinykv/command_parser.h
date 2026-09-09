@@ -8,9 +8,9 @@
 namespace tinykv {
 class CommandParser {
 public:
-  Command parse(const std::string &input) const;
+  static Command parse(const std::string &input);
 
 private:
-  std::vector<std::string> tokenize(const std::string &input) const;
+  static std::vector<std::string> tokenize(const std::string &input);
 };
 } // namespace tinykv

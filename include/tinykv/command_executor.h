@@ -3,8 +3,8 @@
 #include "command.h"
 #include "kv_store.h"
 
-#include <cstdio>
 #include <functional>
+#include <iostream>
 #include <optional>
 #include <stdexcept>
 #include <unordered_map>

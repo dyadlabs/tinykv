@@ -50,9 +50,31 @@ if(BUILD_TESTING)
             tinykv_core
             GTest::gtest_main
     )
+    
+    add_executable(command_parser_test
+        tests/command_parser_test.cpp
+    )
+
+    target_link_libraries(command_parser_test
+        PRIVATE
+            tinykv_core
+            GTest::gtest_main
+    )
+
+    add_executable(command_executor_test
+        tests/command_executor_test.cpp
+    )
+
+    target_link_libraries(command_executor_test
+        PRIVATE
+            tinykv_core
+            GTest::gtest_main
+    )
 
     include(GoogleTest)
 
     gtest_discover_tests(kv_store_test)
+    gtest_discover_tests(command_parser_test)
+    gtest_discover_tests(command_executor_test)
 endif()
 

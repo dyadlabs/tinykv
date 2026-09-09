@@ -9,20 +9,18 @@ bool KVStore::put(const std::string &key, const std::string &value) {
   return true;
 }
 
-std::optional<std::string> KVStore::get(std::string_view key) const {
-  auto it = data_.find(std::string(key));
+std::optional<std::string> KVStore::get(const std::string &key) const {
+  auto it = data_.find(key);
   if (it != data_.end()) {
     return it->second;
   }
   return std::nullopt;
 }
 
-bool KVStore::remove(std::string_view key) {
-  return data_.erase(std::string(key)) == 1;
-}
+bool KVStore::remove(const std::string &key) { return data_.erase(key) == 1; }
 
-bool KVStore::exists(std::string_view key) const {
-  auto it = data_.find(std::string(key));
+bool KVStore::exists(const std::string &key) const {
+  auto it = data_.find(key);
   return it != data_.end();
 }
 

@@ -1,13 +1,14 @@
 #include "tinykv/command_executor.h"
 
-// TODO: better error handling
 namespace tinykv {
+
 CommandExecutor::CommandExecutor() {
   handlers["put"] = handlePut;
   handlers["get"] = handleGet;
   handlers["remove"] = handleRemove;
   handlers["contain"] = handleExists;
 }
+
 void CommandExecutor::execute(KVStore &kv, const Command &command) {
   auto it = handlers.find(command.name);
   if (it == handlers.end()) {
@@ -20,29 +21,31 @@ void CommandExecutor::execute(KVStore &kv, const Command &command) {
 void CommandExecutor::handlePut(KVStore &kv, const Command &command) {
   validateArgs(command, 2);
   kv.put(command.arguments[0], command.arguments[1]);
+  std::cout << "Put " << command.arguments[0] << "\n";
 }
 void CommandExecutor::handleGet(KVStore &kv, const Command &command) {
   validateArgs(command, 1);
   std::optional<std::string> value = kv.get(command.arguments[0]);
   if (value == std::nullopt) {
-    printf("The key does not exist.\n");
+    throw std::runtime_error("The key does not exist");
   } else {
-    printf("Value: %s", value.value().c_str());
+    std::cout << "Value: " << value.value() << "\n";
   }
 }
 
 void CommandExecutor::handleRemove(KVStore &kv, const Command &command) {
   validateArgs(command, 1);
   if (!kv.remove(command.arguments[0])) {
-    printf("The key does not exist.\n");
+    throw std::runtime_error("The key does not exist");
   }
+  std::cout << "Removed " << command.arguments[0] << "\n";
 }
 void CommandExecutor::handleExists(KVStore &kv, const Command &command) {
   validateArgs(command, 1);
   if (kv.exists(command.arguments[0])) {
-    printf("The key exists.\n");
+    std::cout << "The key exists.\n";
   } else {
-    printf("The key does not exist.\n");
+    throw std::runtime_error("The key does not exist");
   }
 }
 

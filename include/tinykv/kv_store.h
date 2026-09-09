@@ -2,7 +2,6 @@
 
 #include <optional>
 #include <string>
-#include <string_view>
 #include <unordered_map>
 
 namespace tinykv {
@@ -10,12 +9,16 @@ namespace tinykv {
 class KVStore {
 public:
   bool put(const std::string &key, const std::string &value);
-  std::optional<std::string> get(std::string_view key) const;
-  bool remove(std::string_view key);
-  bool exists(std::string_view key) const;
+  std::optional<std::string> get(const std::string &key) const;
+  bool remove(const std::string &key);
+  bool exists(const std::string &key) const;
 
 private:
   std::unordered_map<std::string, std::string> data_;
+
+  friend bool operator==(const KVStore &lhs, const KVStore &rhs) {
+    return lhs.data_ == rhs.data_;
+  }
 };
 
 } // namespace tinykv

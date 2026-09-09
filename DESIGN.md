@@ -25,7 +25,7 @@ Initialize system state -> Start main execution loop -> Read and parse user inpu
 - `put KEY VALUE`
 - `get KEY`
 - `remove KEY`
-- `exists KEY`
+- `contain KEY`
 
 ### Project Structure
 

@@ -12,6 +12,20 @@ TEST(PutTest, CommonInput) {
   EXPECT_TRUE(kv.put("Hello", "World!"));
 }
 
+TEST(PutTest, DoublePut) {
+  tinykv::KVStore kv;
+  EXPECT_TRUE(kv.put("a", "apple"));
+  EXPECT_EQ(kv.get("a").value(), "apple");
+  EXPECT_TRUE(kv.put("a", "abandon"));
+  EXPECT_EQ(kv.get("a").value(), "abandon");
+}
+
+TEST(PutTest, PutEmpty) {
+  tinykv::KVStore kv;
+  EXPECT_TRUE(kv.put("a", ""));
+  EXPECT_EQ(kv.get("a").value(), "");
+}
+
 TEST(GetTest, GetNonexist) {
   tinykv::KVStore kv;
   EXPECT_EQ(kv.get("Hello"), std::nullopt);
@@ -44,4 +58,13 @@ TEST(ExistsTest, Exist) {
   tinykv::KVStore kv;
   kv.put("Hello", "World!");
   EXPECT_TRUE(kv.exists("Hello"));
+}
+
+TEST(IntegrationTest, RemoveAndPut) {
+  tinykv::KVStore kv;
+  EXPECT_TRUE(kv.put("a", "apple"));
+  EXPECT_EQ(kv.get("a").value(), "apple");
+  EXPECT_TRUE(kv.remove("a"));
+  EXPECT_TRUE(kv.put("a", "abandon"));
+  EXPECT_EQ(kv.get("a").value(), "abandon");
 }

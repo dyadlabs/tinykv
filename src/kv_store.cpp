@@ -1,12 +1,12 @@
 #include "tinykv/kv_store.h"
+#include "tinykv/error.h"
 
 namespace tinykv {
-bool KVStore::put(const std::string &key, const std::string &value) {
+void KVStore::put(const std::string &key, const std::string &value) {
   if (key.empty()) {
-    return false;
+    throw InvalidKey("The key to insert is empty.");
   }
   data_[key] = value;
-  return true;
 }
 
 std::optional<std::string> KVStore::get(const std::string &key) const {

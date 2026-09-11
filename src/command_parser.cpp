@@ -1,4 +1,5 @@
 #include "tinykv/command_parser.h"
+#include "tinykv/error.h"
 
 namespace tinykv {
 
@@ -38,7 +39,7 @@ std::vector<std::string> CommandParser::tokenize(const std::string &input) {
   }
 
   if (in_quotes) {
-    throw std::runtime_error("Incomplete quotes");
+    throw ParseError("Incomplete quotes.");
   }
 
   if (!current.empty()) {

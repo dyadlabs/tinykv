@@ -1,4 +1,6 @@
 #include "tinykv/command_executor.h"
+#include "tinykv/error.h"
+#include "tinykv/result.h"
 
 namespace tinykv {
 
@@ -6,52 +8,54 @@ CommandExecutor::CommandExecutor() {
   handlers["put"] = handlePut;
   handlers["get"] = handleGet;
   handlers["remove"] = handleRemove;
-  handlers["contain"] = handleExists;
+  handlers["exists"] = handleExists;
 }
 
-void CommandExecutor::execute(KVStore &kv, const Command &command) {
+ExecutionResult CommandExecutor::execute(KVStore &kv, const Command &command) {
   auto it = handlers.find(command.name);
   if (it == handlers.end()) {
-    throw std::runtime_error("Unknown command");
+    throw UnknownCommand("The command does not exist.");
   }
 
-  it->second(kv, command);
+  return it->second(kv, command);
 }
 
-void CommandExecutor::handlePut(KVStore &kv, const Command &command) {
+PutResult CommandExecutor::handlePut(KVStore &kv, const Command &command) {
   validateArgs(command, 2);
-  kv.put(command.arguments[0], command.arguments[1]);
-  std::cout << "Put " << command.arguments[0] << "\n";
-}
-void CommandExecutor::handleGet(KVStore &kv, const Command &command) {
-  validateArgs(command, 1);
-  std::optional<std::string> value = kv.get(command.arguments[0]);
-  if (value == std::nullopt) {
-    throw std::runtime_error("The key does not exist");
-  } else {
-    std::cout << "Value: " << value.value() << "\n";
-  }
+  std::optional<std::string> original_value;
+  const std::string &key = command.arguments[0];
+  const std::string &value = command.arguments[1];
+  original_value = kv.get(key);
+  kv.put(key, value);
+  return {key, value, original_value};
 }
 
-void CommandExecutor::handleRemove(KVStore &kv, const Command &command) {
+GetResult CommandExecutor::handleGet(KVStore &kv, const Command &command) {
   validateArgs(command, 1);
-  if (!kv.remove(command.arguments[0])) {
-    throw std::runtime_error("The key does not exist");
-  }
-  std::cout << "Removed " << command.arguments[0] << "\n";
-}
-void CommandExecutor::handleExists(KVStore &kv, const Command &command) {
-  validateArgs(command, 1);
-  if (kv.exists(command.arguments[0])) {
-    std::cout << "The key exists.\n";
-  } else {
-    throw std::runtime_error("The key does not exist");
-  }
+  const std::string &key = command.arguments[0];
+  std::optional<std::string> value = kv.get(key);
+  return {key, value};
 }
 
-void CommandExecutor::validateArgs(const Command &command, int num) {
+RemoveResult CommandExecutor::handleRemove(KVStore &kv,
+                                           const Command &command) {
+  validateArgs(command, 1);
+  const std::string &key = command.arguments[0];
+  bool success = kv.remove(key);
+  return {success, key};
+}
+
+ExistsResult CommandExecutor::handleExists(KVStore &kv,
+                                           const Command &command) {
+  validateArgs(command, 1);
+  const std::string &key = command.arguments[0];
+  bool success = kv.exists(key);
+  return {success, key};
+}
+
+void CommandExecutor::validateArgs(const Command &command, size_t num) {
   if (command.arguments.size() != num) {
-    throw std::runtime_error("Incorrect argument number");
+    throw InvalidArguments("Incorrect number of arguments for this command.");
   }
 }
 } // namespace tinykv

@@ -1,8 +1,8 @@
 #include "tinykv/command.h"
 #include "tinykv/command_parser.h"
+#include "tinykv/error.h"
+
 #include <gtest/gtest.h>
-#include <stdexcept>
-#include <string>
 
 TEST(ParseTest, EmptyInput1) {
   tinykv::Command result = tinykv::CommandParser::parse("");
@@ -46,11 +46,7 @@ TEST(ParseTest, ArgumentInQuote) {
   EXPECT_EQ(result, expected);
 }
 
-TEST(ParseTest, SingleQuote) {
-  try {
-    tinykv::Command result = tinykv::CommandParser::parse("put a \"hello");
-    FAIL() << "expected std::runtime_error";
-  } catch (const std::runtime_error &e) {
-    EXPECT_STREQ(e.what(), "Incomplete quotes");
-  }
+TEST(ParseTest, IncompleteQuotes) {
+  EXPECT_THROW(tinykv::CommandParser::parse("put a \"hello"),
+               tinykv::ParseError);
 }

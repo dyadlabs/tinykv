@@ -50,3 +50,40 @@ TEST(ParseTest, IncompleteQuotes) {
   EXPECT_THROW(tinykv::CommandParser::parse("put a \"hello"),
                tinykv::ParseError);
 }
+
+TEST(QuoteTest, MultipleQuotedArguments) {
+  tinykv::Command expected = {"put", {"a b", "c d"}};
+  tinykv::Command result = tinykv::CommandParser::parse("put \"a b\" \"c d\"");
+  EXPECT_EQ(result, expected);
+}
+
+TEST(QuoteTest, EmptyArgumentBetweenArguments) {
+  tinykv::Command expected = {"put", {"", "v"}};
+  tinykv::Command result = tinykv::CommandParser::parse("put \"\" v");
+  EXPECT_EQ(result, expected);
+}
+
+TEST(QuoteTest, EmptyArgumentAtEndOfLine) {
+  tinykv::Command expected = {"put", {"a", ""}};
+  tinykv::Command result = tinykv::CommandParser::parse("put a \"\"");
+  EXPECT_EQ(result, expected);
+}
+
+TEST(QuoteTest, EmptyArgumentIsTheOnlyArgument) {
+  tinykv::Command expected = {"get", {""}};
+  tinykv::Command result = tinykv::CommandParser::parse("get \"\"");
+  EXPECT_EQ(result, expected);
+}
+
+TEST(QuoteTest, QuotesSplitWhenEmbeddedInAMiddleOfToken) {
+  // Quotes always delimit a whole token: b"c d"e is three tokens, not one.
+  tinykv::Command expected = {"put", {"a", "b", "c d", "e"}};
+  tinykv::Command result = tinykv::CommandParser::parse("put a b\"c d\"e");
+  EXPECT_EQ(result, expected);
+}
+
+TEST(QuoteTest, WholeLineQuotedBecomesASingleToken) {
+  tinykv::Command expected = {"put a apple", {}};
+  tinykv::Command result = tinykv::CommandParser::parse("\"put a apple\"");
+  EXPECT_EQ(result, expected);
+}

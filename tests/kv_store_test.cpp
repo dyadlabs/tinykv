@@ -3,12 +3,53 @@
 
 #include <gtest/gtest.h>
 
-TEST(PutTest, EmptyKeyThrowsInvalidKey) {
+#include <string>
+
+namespace {
+
+template <typename Fn> std::string messageOf(Fn op) {
+  try {
+    op();
+  } catch (const tinykv::TinyKVError &e) {
+    return e.what();
+  }
+  return "<no exception thrown>";
+}
+
+} // namespace
+
+TEST(EmptyKeyTest, EveryOperationRejectsAnEmptyKey) {
   tinykv::KVStore kv;
 
   EXPECT_THROW(kv.put("", ""), tinykv::InvalidKey);
   EXPECT_THROW(kv.put("", "World!"), tinykv::InvalidKey);
-  EXPECT_FALSE(kv.exists(""));
+  EXPECT_THROW(kv.get(""), tinykv::InvalidKey);
+  EXPECT_THROW(kv.remove(""), tinykv::InvalidKey);
+  EXPECT_THROW(kv.exists(""), tinykv::InvalidKey);
+}
+
+TEST(EmptyKeyTest, EveryOperationReportsTheSameMessage) {
+  tinykv::KVStore kv;
+
+  const std::string expected = messageOf([&] { kv.put("", "v"); });
+  ASSERT_NE(expected, "<no exception thrown>");
+
+  EXPECT_EQ(messageOf([&] { kv.put("", "v"); }), expected);
+  EXPECT_EQ(messageOf([&] { kv.get(""); }), expected);
+  EXPECT_EQ(messageOf([&] { kv.remove(""); }), expected);
+  EXPECT_EQ(messageOf([&] { kv.exists(""); }), expected);
+}
+
+TEST(EmptyKeyTest, RejectedPutLeavesTheStoreUnchanged) {
+  tinykv::KVStore kv;
+  kv.put("a", "apple");
+
+  tinykv::KVStore before;
+  before.put("a", "apple");
+
+  EXPECT_THROW(kv.put("", "rejected"), tinykv::InvalidKey);
+
+  EXPECT_EQ(kv, before);
 }
 
 TEST(PutTest, CommonInput) {

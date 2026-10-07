@@ -30,6 +30,15 @@ TEST(ExecuteTest, EmptyKeyThrowsInvalidKey) {
   EXPECT_THROW(executor.execute(kv, command), tinykv::InvalidKey);
 }
 
+TEST(ExecuteTest, EmptyKeyArgumentIsRejectedForReadsToo) {
+  tinykv::KVStore kv;
+  tinykv::CommandExecutor executor;
+  // Exactly what CommandParser::parse("get \"\"") produces.
+  tinykv::Command command{"get", {""}};
+
+  EXPECT_THROW(executor.execute(kv, command), tinykv::InvalidKey);
+}
+
 TEST(ExecuteTest, PutReturnsInsertResult) {
   tinykv::KVStore kv;
   tinykv::CommandExecutor executor;

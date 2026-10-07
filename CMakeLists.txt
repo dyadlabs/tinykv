@@ -72,10 +72,21 @@ if(BUILD_TESTING)
             GTest::gtest_main
     )
 
+    add_executable(renderer_test
+            tests/renderer_test.cpp
+    )
+
+    target_link_libraries(renderer_test
+        PRIVATE
+            tinykv_core
+            GTest::gtest_main
+    )
+
     include(GoogleTest)
 
     gtest_discover_tests(kv_store_test)
     gtest_discover_tests(command_parser_test)
     gtest_discover_tests(command_executor_test)
+    gtest_discover_tests(renderer_test)
 endif()
 

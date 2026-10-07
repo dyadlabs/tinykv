@@ -3,7 +3,6 @@
 #include "command.h"
 
 #include <cctype>
-#include <sstream>
 
 namespace tinykv {
 class CommandParser {

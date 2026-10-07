@@ -5,7 +5,6 @@
 #include "result.h"
 
 #include <functional>
-#include <iostream>
 #include <optional>
 #include <unordered_map>
 

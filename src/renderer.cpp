@@ -32,7 +32,7 @@ void Renderer::render(const ExecutionResult &result, std::ostream &os) {
           }
         } else {
           if (!r.exists) {
-            os << "The key does not exists.\n";
+            os << "The key does not exist.\n";
           } else {
             os << "Found the key \"" << r.key << "\".\n";
           }
